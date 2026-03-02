@@ -56,3 +56,15 @@ def user_logout(request):
             return Response({'message': 'Successfully logged out.'}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+# Get profile info
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user(request):
+    if request.method == 'GET':
+        try:
+            user = request.user 
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
