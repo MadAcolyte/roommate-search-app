@@ -1,23 +1,67 @@
 from rest_framework import serializers
 from .models import CustomUser
 
-class UserSerializer(serializers.ModelSerializer):
+
+# REGISTER
+class UserCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+
     class Meta:
         model = CustomUser
         fields = [
-            'username', 'email', 'password', 'firstName', 'lastName', 'bio', 
-            'age', 'gender', 'smoking', 'pets', 'cleanliness_level', 'city', 'isOwner', 'isUser'
+            'username',
+            'email',
+            'password',
+            'firstName',
+            'lastName',
+            'bio',
+            'age',
+            'gender',
+            'smoking',
+            'pets',
+            'cleanliness_level',
+            'city',
+            'isOwner',
+            'isUser'
         ]
-        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        # Get password for validation
         password = validated_data.pop('password')
-
-        # Create user with all data
         user = CustomUser(**validated_data)
-
-        # Set password
         user.set_password(password)
         user.save()
         return user
+
+
+
+# READ PROFILE 
+class UserReadSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUser
+        exclude = ['password']
+
+
+
+# UPDATE PROFILE
+class UserUpdateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CustomUser
+        fields = [
+            'firstName',
+            'lastName',
+            'bio',
+            'age',
+            'gender',
+            'smoking',
+            'pets',
+            'cleanliness_level',
+            'city'
+        ]
+
+
+# LOGIN
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
