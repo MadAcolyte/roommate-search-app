@@ -1,18 +1,19 @@
 from django.contrib.auth import authenticate
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
 from rest_framework import status
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import CustomUser
-from .serializers import UserCreateSerializer, UserReadSerializer, LoginSerializer, UserUpdateSerializer
+from .serializers import UserCreateSerializer, UserReadSerializer, LoginSerializer, UserUpdateSerializer, ChangePasswordSerializer
 
 
 class TokenSerializer(serializers.Serializer):
-    token = serializers.CharField()
+    refresh = serializers.CharField()
+    access = serializers.CharField()
 
 
 class MessageSerializer(serializers.Serializer):
@@ -25,6 +26,7 @@ class MessageSerializer(serializers.Serializer):
     responses=UserReadSerializer
 )
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def register_user(request):
     serializer = UserCreateSerializer(data=request.data)
     if serializer.is_valid():
@@ -39,6 +41,7 @@ def register_user(request):
     responses=TokenSerializer
 )
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def user_login(request):
     username = request.data.get('username')
     password = request.data.get('password')
@@ -55,8 +58,11 @@ def user_login(request):
             user = authenticate(username=username, password=password)
 
     if user:
-        token, _ = Token.objects.get_or_create(user=user)
-        return Response({'token': token.key}, status=status.HTTP_200_OK)
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }, status=status.HTTP_200_OK)
 
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
 
@@ -68,20 +74,23 @@ def user_login(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def user_logout(request):
-    try:
-        request.user.auth_token.delete()
-        return Response({'message': 'Successfully logged out.'}, status=status.HTTP_200_OK)
-    except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    refresh_token = request.data.get("refresh")
+    if refresh_token:
+        try:
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+        except Exception:
+            pass 
+    return Response({'message': 'Successfully logged out.'}, status=status.HTTP_200_OK)
 
 
-# Get user profile
+# Get current user profile
 @extend_schema(
     responses=UserReadSerializer
 )
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def get_user(request):
+def get_current_user(request):
     return Response(UserReadSerializer(request.user).data)
 
 
@@ -92,9 +101,26 @@ def get_user(request):
 )
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
-def update_user(request):
+def update_user_data(request):
     serializer = UserUpdateSerializer(request.user, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
         return Response(UserReadSerializer(request.user).data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# Change password
+
+@extend_schema(
+    request=ChangePasswordSerializer,
+    responses=UserReadSerializer
+)
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def change_password(request):
+    serializer = ChangePasswordSerializer(
+        instance=request.user,
+        data=request.data
+    )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(UserReadSerializer(request.user).data)
