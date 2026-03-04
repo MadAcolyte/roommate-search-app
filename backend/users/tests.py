@@ -25,7 +25,9 @@ class AuthEndpointTests(APITestCase):
 
     def test_register_user(self):
         try:
-            response = self.client.post("/api/auth/register/", self.user_data, format="json")
+            register_data = self.user_data.copy()
+            register_data["password_confirm"] = register_data["password"]
+            response = self.client.post("/api/auth/register/", register_data, format="json")
             assert response.status_code == status.HTTP_201_CREATED
             assert response.data["username"] == self.user_data["username"]
             print("REGISTER: OK")
@@ -94,7 +96,11 @@ class AuthEndpointTests(APITestCase):
             password=self.user_data["password"]
         )
         self.client.force_authenticate(user=user)
-        change_data = {"old_password": self.user_data["password"], "new_password": "NewPass456!"}
+        change_data = {
+            "old_password": self.user_data["password"],
+            "new_password": "NewPass456!",
+            "new_password_confirm": "NewPass456!"
+        }
         try:
             response = self.client.patch("/api/auth/change_password/", change_data, format="json")
             assert response.status_code == status.HTTP_200_OK
