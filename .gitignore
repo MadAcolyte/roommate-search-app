@@ -29,3 +29,21 @@ frontend/dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# SQLite DB
+*.sqlite3
+
+# Django migrations cache
+*/migrations/__pycache__/
+
+# VSCode
+.vscode/
+
+# Environment
+.env
