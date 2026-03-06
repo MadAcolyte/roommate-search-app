@@ -27,7 +27,7 @@ class AuthEndpointTests(APITestCase):
         try:
             register_data = self.user_data.copy()
             register_data["password_confirm"] = register_data["password"]
-            response = self.client.post("/api/auth/register/", register_data, format="json")
+            response = self.client.post("/api/auth/register", register_data, format="json")
             assert response.status_code == status.HTTP_201_CREATED
             assert response.data["username"] == self.user_data["username"]
             print("REGISTER: OK")
@@ -46,7 +46,7 @@ class AuthEndpointTests(APITestCase):
             "password": self.user_data["password"]
         }
         try:
-            response = self.client.post("/api/auth/login/", login_data, format="json")
+            response = self.client.post("/api/auth/login", login_data, format="json")
             assert response.status_code == status.HTTP_200_OK
             assert "access" in response.data
             self.access_token = response.data["access"]
@@ -64,7 +64,7 @@ class AuthEndpointTests(APITestCase):
         )
         self.client.force_authenticate(user=user)
         try:
-            response = self.client.get("/api/user/get_user/")
+            response = self.client.get("/api/user/get_user")
             assert response.status_code == status.HTTP_200_OK
             assert response.data["username"] == user.username
             print("GET USER: OK")
@@ -81,7 +81,7 @@ class AuthEndpointTests(APITestCase):
         self.client.force_authenticate(user=user)
         update_data = {"bio": "Updated bio"}
         try:
-            response = self.client.put("/api/user/update_user/", update_data, format="json")
+            response = self.client.put("/api/user/update_user", update_data, format="json")
             assert response.status_code == status.HTTP_200_OK
             assert response.data["bio"] == "Updated bio"
             print("UPDATE USER: OK")
@@ -102,7 +102,7 @@ class AuthEndpointTests(APITestCase):
             "new_password_confirm": "NewPass456!"
         }
         try:
-            response = self.client.patch("/api/auth/change_password/", change_data, format="json")
+            response = self.client.patch("/api/auth/change_password", change_data, format="json")
             assert response.status_code == status.HTTP_200_OK
             user.refresh_from_db()
             assert user.check_password("NewPass456!")
@@ -117,13 +117,13 @@ class AuthEndpointTests(APITestCase):
             email=self.user_data["email"],
             password=self.user_data["password"]
         )
-        login_response = self.client.post("/api/auth/login/", {"username": user.username, "password": self.user_data["password"]}, format="json")
+        login_response = self.client.post("/api/auth/login", {"username": user.username, "password": self.user_data["password"]}, format="json")
         refresh_token = login_response.data["refresh"]
         access_token = login_response.data["access"]
 
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access_token}")
         try:
-            response = self.client.post("/api/auth/logout/", {"refresh": refresh_token}, format="json")
+            response = self.client.post("/api/auth/logout", {"refresh": refresh_token}, format="json")
             assert response.status_code == status.HTTP_200_OK
             assert response.data["message"] == "Successfully logged out."
             print("LOGOUT: OK")

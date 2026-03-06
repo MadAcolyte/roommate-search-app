@@ -10,6 +10,9 @@ export interface AuthData {
   refreshTokenExpiresAtUtc: string;
 }
 
+// IMPORTANT !!!!!!!!!!!!!!!!!!!
+// SOME FUNCTIONS ARE NOT USED YET, AND IDK IF WILL BE USED, BUT I'M LEAVING THEM HERE FOR NOW FOR FUTURE
+
 export const saveAuthData = (authData: AuthData): void => {
   localStorage.setItem(TOKEN_KEY, authData.token);
   localStorage.setItem(TOKEN_EXPIRY_KEY, authData.tokenExpiresAtUtc);

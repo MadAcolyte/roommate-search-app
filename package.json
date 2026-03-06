@@ -1,0 +1,13 @@
+{
+  "name": "roommate-search-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "frontend": "cd frontend && npm run dev",
+    "backend": "cd backend && python manage.py runserver",
+    "start": "concurrently \"npm run backend\" \"npm run frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "8.2.2"
+  }
+}
