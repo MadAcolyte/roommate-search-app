@@ -12,8 +12,6 @@ class CustomUser(AbstractUser):
     pets = models.BooleanField(default=False)
     cleanliness_level = models.IntegerField(default=3)
     city = models.CharField(max_length=50)
-    isOwner = models.BooleanField(default=False)
-    isUser = models.BooleanField(default=True)
 
     def __str__(self):
         return self.username
