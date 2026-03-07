@@ -12,15 +12,6 @@ class AuthEndpointTests(APITestCase):
             "password": "TestPass123!",
             "firstName": "Test",
             "lastName": "User",
-            "bio": "Test bio",
-            "age": 30,
-            "gender": "M",
-            "smoking": False,
-            "pets": False,
-            "cleanliness_level": 7,
-            "city": "Vilnius",
-            "isOwner": False,
-            "isUser": True
         }
 
     def test_register_user(self):
@@ -48,9 +39,9 @@ class AuthEndpointTests(APITestCase):
         try:
             response = self.client.post("/api/auth/login", login_data, format="json")
             assert response.status_code == status.HTTP_200_OK
-            assert "access" in response.data
-            self.access_token = response.data["access"]
-            self.refresh_token = response.data["refresh"]
+            assert "accessToken" in response.data
+            self.access_token = response.data["accessToken"]
+            self.refresh_token = response.data["refreshToken"]
             print("LOGIN: OK")
         except Exception as e:
             print("LOGIN: ERROR", e)
@@ -118,12 +109,12 @@ class AuthEndpointTests(APITestCase):
             password=self.user_data["password"]
         )
         login_response = self.client.post("/api/auth/login", {"username": user.username, "password": self.user_data["password"]}, format="json")
-        refresh_token = login_response.data["refresh"]
-        access_token = login_response.data["access"]
+        refresh_token = login_response.data["refreshToken"]
+        access_token = login_response.data["accessToken"]
 
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access_token}")
         try:
-            response = self.client.post("/api/auth/logout", {"refresh": refresh_token}, format="json")
+            response = self.client.post("/api/auth/logout", {"refreshToken": refresh_token}, format="json")
             assert response.status_code == status.HTTP_200_OK
             assert response.data["message"] == "Successfully logged out."
             print("LOGOUT: OK")

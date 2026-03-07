@@ -16,15 +16,6 @@ class UserCreateSerializer(serializers.ModelSerializer):
             'password_confirm',
             'firstName',
             'lastName',
-            'bio',
-            'age',
-            'gender',
-            'smoking',
-            'pets',
-            'cleanliness_level',
-            'city',
-            'isOwner',
-            'isUser'
         ]
 
     def validate_password(self, value):

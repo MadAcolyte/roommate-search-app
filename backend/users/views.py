@@ -6,6 +6,7 @@ from rest_framework import status
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
+from datetime import timedelta, datetime, timezone
 
 from .models import CustomUser
 from .serializers import UserCreateSerializer, UserReadSerializer, LoginSerializer, UserUpdateSerializer, ChangePasswordSerializer
@@ -60,8 +61,10 @@ def user_login(request):
     if user:
         refresh = RefreshToken.for_user(user)
         return Response({
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
+            'refreshToken': str(refresh),
+            'accessTokenExpiresAtUtc': (datetime.now(timezone.utc)+timedelta(hours=1)),
+            'accessToken': str(refresh.access_token),
+            'refreshTokenExpiresAtUtc': (datetime.now(timezone.utc)+timedelta(days=1))
         }, status=status.HTTP_200_OK)
 
     return Response({'error': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
