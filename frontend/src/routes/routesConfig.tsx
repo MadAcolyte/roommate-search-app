@@ -20,6 +20,11 @@ export const routes: Routes[] = [
     page: RegisterPage,
     isPrivate: false,
   },
+  {
+    path: "/home",
+    page: () => <div>Home</div>,
+    isPrivate: true,
+  },
 ];
 
 export const isPublicRoute = (path: string): boolean => {

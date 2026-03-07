@@ -19,9 +19,13 @@ const RegisterPage = (): JSX.Element => {
 
   const onSubmit = (data: RegisterFormData) => {
     mutation.mutate(data, {
-      onSuccess: () => {
-        toast.success("User registered successfully");
-        navigate("/login");
+      onSuccess: (response) => {
+        if (response.success) {
+          toast.success("User registered successfully");
+          navigate("/login");
+        } else {
+          toast.error(response.message);
+        }
       },
       onError: () => {
         toast.error("Failed to register user");

@@ -5,7 +5,7 @@ import Button from "../../components/CustomButtons/CustomButtons";
 import { StyledForm } from "../../components/FormComponents/FormCompoents";
 import { LoginFormData } from "./types/loginTypes";
 import { useMutation } from "@tanstack/react-query";
-import loginUser from "./loginRequests/loginRequests";
+import { loginUser } from "./loginRequests/loginRequests";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
@@ -19,9 +19,13 @@ const LoginPage = (): JSX.Element => {
 
   const onSubmit = (data: LoginFormData) => {
     mutation.mutate(data, {
-      onSuccess: () => {
-        toast.success("Logged in successfully");
-        navigate("/");
+      onSuccess: (response) => {
+        if (response.success && response.data) {
+          toast.success("Logged in successfully");
+          navigate("/home");
+        } else {
+          toast.error(response.message);
+        }
       },
       onError: () => {
         toast.error("Failed to login");

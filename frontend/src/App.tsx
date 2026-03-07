@@ -1,6 +1,10 @@
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import AppRoutes from "./routes/AppRoutes";
 import { styled } from "styled-components";
+import { initializeTokenRefresh, stopTokenRefresh } from "./utils/tokenRefresh";
+import { isPrivateRoute, isPublicRoute } from "./routes/routesConfig";
+import { useLocation, useNavigate } from "react-router-dom";
+import { isUserAuthenticated } from "./utils/authUtils";
 
 const PageFallback = styled.div`
   display: flex;
@@ -33,6 +37,40 @@ const Loader = styled.div`
   }
 `;
 
+const RouteGuard = ({ children }: { children: JSX.Element }): JSX.Element => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const pathname = location.pathname;
+
+  useEffect(() => {
+    const isAuthenticated = isUserAuthenticated();
+
+    if (isAuthenticated) {
+      initializeTokenRefresh();
+    } else {
+      stopTokenRefresh();
+    }
+
+    if (!isAuthenticated && isPrivateRoute(pathname)) {
+      navigate("/login", { replace: true, state: { from: location } });
+    } else if (
+      isAuthenticated &&
+      isPublicRoute(pathname) &&
+      (pathname === "/login" || pathname === "/register")
+    ) {
+      navigate("/home", { replace: true });
+    }
+  }, [pathname, navigate]);
+
+  useEffect(() => {
+    return () => {
+      stopTokenRefresh();
+    };
+  }, []);
+
+  return <>{children}</>;
+};
+
 const App = (): JSX.Element => {
   return (
     <>
@@ -43,7 +81,9 @@ const App = (): JSX.Element => {
           </PageFallback>
         }
       >
-        <AppRoutes />
+        <RouteGuard>
+          <AppRoutes />
+        </RouteGuard>
       </Suspense>
     </>
   );
