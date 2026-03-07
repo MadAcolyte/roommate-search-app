@@ -51,6 +51,12 @@ const RouteGuard = ({ children }: { children: JSX.Element }): JSX.Element => {
       stopTokenRefresh();
     }
 
+    if (pathname === "/" && isAuthenticated) {
+      navigate("/home", { replace: true });
+    } else if (pathname === "/" && !isAuthenticated) {
+      navigate("/login", { replace: true, state: { from: location } });
+    }
+
     if (!isAuthenticated && isPrivateRoute(pathname)) {
       navigate("/login", { replace: true, state: { from: location } });
     } else if (
