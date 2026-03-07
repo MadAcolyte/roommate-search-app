@@ -13,8 +13,13 @@ from .serializers import UserCreateSerializer, UserReadSerializer, LoginSerializ
 
 
 class TokenSerializer(serializers.Serializer):
-    refresh = serializers.CharField()
-    access = serializers.CharField()
+    refreshToken = serializers.CharField()
+    accessToken = serializers.CharField()
+    accessTokenExpiresAtUtc = serializers.CharField()
+    refreshTokenExpiresAtUtc = serializers.CharField()
+
+class RefreshTokenSerialzer(serializers.Serializer):
+    refreshToken = serializers.CharField()
 
 
 class MessageSerializer(serializers.Serializer):
@@ -77,7 +82,7 @@ def user_login(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def user_logout(request):
-    refresh_token = request.data.get("refresh")
+    refresh_token = request.data.get("refreshToken")
     if refresh_token:
         try:
             token = RefreshToken(refresh_token)
@@ -85,6 +90,30 @@ def user_logout(request):
         except Exception:
             pass 
     return Response({'message': 'Successfully logged out.'}, status=status.HTTP_200_OK)
+
+# Get refresh token
+
+@extend_schema(
+    request=RefreshTokenSerialzer,  # contains old refresh token
+    responses=TokenSerializer  # returns new tokens
+)
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def refresh_access_token(request):
+    refresh_token_str = request.data.get("refreshToken")
+    if not refresh_token_str:
+        return Response({'error': 'Refresh token required'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    try:
+        token = RefreshToken(refresh_token_str)
+        return Response({
+            'refreshToken': str(token),
+            'accessTokenExpiresAtUtc': (datetime.now(timezone.utc)+timedelta(hours=1)),
+            'accessToken': str(token.access_token),
+            'refreshTokenExpiresAtUtc': (datetime.now(timezone.utc)+timedelta(days=1))
+        }, status=status.HTTP_200_OK)
+    except Exception:
+        return Response({'error': 'Invalid token'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 # Get current user profile

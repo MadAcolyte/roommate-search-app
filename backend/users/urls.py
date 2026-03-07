@@ -1,4 +1,4 @@
-from .views import register_user, user_login, user_logout, get_current_user, update_user_data, change_password
+from .views import register_user, user_login, user_logout, get_current_user, update_user_data, change_password, refresh_access_token
 from django.urls import path
 
 urlpatterns = [
@@ -7,5 +7,6 @@ urlpatterns = [
     path('api/auth/logout', user_logout, name='logout'),
     path('api/auth/change_password', change_password, name='change_password'),
     path('api/user/get_user', get_current_user, name='user_info'),
-    path('api/user/update_user', update_user_data, name='update_user')
+    path('api/user/update_user', update_user_data, name='update_user'),
+    path('api/auth/refresh_access_token', refresh_access_token, name='refresh_access_token')
 ]
