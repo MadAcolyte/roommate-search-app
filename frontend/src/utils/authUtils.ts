@@ -1,21 +1,21 @@
-const TOKEN_KEY = "token";
-const TOKEN_EXPIRY_KEY = "tokenExpiresAtUtc";
+const ACCESS_TOKEN_KEY = "accessToken";
+const ACCESS_TOKEN_EXPIRY_KEY = "accessTokenExpiresAtUtc";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const REFRESH_TOKEN_EXPIRY_KEY = "refreshTokenExpiresAtUtc";
 
 export interface AuthData {
-  token: string;
-  tokenExpiresAtUtc: string;
+  accessToken: string;
+  accessTokenExpiresAtUtc: string;
   refreshToken: string;
   refreshTokenExpiresAtUtc: string;
 }
 
-// IMPORTANT !!!!!!!!!!!!!!!!!!!
-// SOME FUNCTIONS ARE NOT USED YET, AND IDK IF WILL BE USED, BUT I'M LEAVING THEM HERE FOR NOW FOR FUTURE
-
 export const saveAuthData = (authData: AuthData): void => {
-  localStorage.setItem(TOKEN_KEY, authData.token);
-  localStorage.setItem(TOKEN_EXPIRY_KEY, authData.tokenExpiresAtUtc);
+  localStorage.setItem(ACCESS_TOKEN_KEY, authData.accessToken);
+  localStorage.setItem(
+    ACCESS_TOKEN_EXPIRY_KEY,
+    authData.accessTokenExpiresAtUtc,
+  );
   localStorage.setItem(REFRESH_TOKEN_KEY, authData.refreshToken);
   localStorage.setItem(
     REFRESH_TOKEN_EXPIRY_KEY,
@@ -24,11 +24,15 @@ export const saveAuthData = (authData: AuthData): void => {
 };
 
 export const getToken = (): string | null => {
-  return localStorage.getItem(TOKEN_KEY);
+  return localStorage.getItem(ACCESS_TOKEN_KEY);
+};
+
+export const getRefreshToken = (): string | null => {
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
 };
 
 export const getTokenExpiryDate = (): Date | null => {
-  const expiryDateStr = localStorage.getItem(TOKEN_EXPIRY_KEY);
+  const expiryDateStr = localStorage.getItem(ACCESS_TOKEN_EXPIRY_KEY);
   if (!expiryDateStr) return null;
 
   return new Date(expiryDateStr);
@@ -49,8 +53,8 @@ export const isUserAuthenticated = (): boolean => {
 };
 
 export const clearToken = (): void => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(TOKEN_EXPIRY_KEY);
+  localStorage.removeItem(ACCESS_TOKEN_KEY);
+  localStorage.removeItem(ACCESS_TOKEN_EXPIRY_KEY);
   localStorage.removeItem(REFRESH_TOKEN_KEY);
   localStorage.removeItem(REFRESH_TOKEN_EXPIRY_KEY);
 };
