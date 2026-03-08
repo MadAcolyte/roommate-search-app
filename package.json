@@ -6,7 +6,11 @@
     "frontend": "cd frontend && npm run dev",
     "backend": "cd backend && python manage.py runserver",
     "migrations": "cd backend && python manage.py makemigrations && python manage.py migrate",
-    "start": "concurrently \"npm run backend\" \"npm run frontend\""
+    "install:backend": "cd backend && pip install -r requirements.txt",
+    "install:frontend": "cd frontend && npm install",
+    "install": "concurrently \"npm run install:backend\" \"npm run install:frontend\"",
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "setup:all": "concurrently \"npm run install:backend\" \"npm run install:frontend\" \"npm run migrations\" \"npm run start\""
   },
   "devDependencies": {
     "concurrently": "8.2.2"
