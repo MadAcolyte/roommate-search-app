@@ -1,18 +1,22 @@
-import { GenericResponseWithPayload, POST } from "../../../utils/api";
+import { GenericResponseWithPayload, GET, POST } from "../../../utils/api";
 import {
   AuthData,
   getRefreshToken,
   saveAuthData,
 } from "../../../utils/authUtils";
-import { LoginFormData } from "../types/loginTypes";
+import { LoginFormData, UserProfile } from "../types/loginTypes";
 
-export const loginUser = (data: LoginFormData) =>
+export type LoginResult = GenericResponseWithPayload<UserProfile>;
+
+export const loginUser = (data: LoginFormData): Promise<LoginResult> =>
   POST<GenericResponseWithPayload<AuthData>>("auth/login", data).then(
-    (response) => {
+    async (response) => {
       if (response.success && response.data) {
         saveAuthData(response.data);
       }
-      return response;
+      const profileResponse =
+        await GET<GenericResponseWithPayload<UserProfile>>("user/get_user");
+      return profileResponse as LoginResult;
     },
   );
 

@@ -19,6 +19,7 @@ interface ContainerProps {
   flexWrap?: "wrap" | "nowrap";
   backgroundColor?: string;
   minHeight?: string;
+  borderRadius?: string;
 }
 
 export const Container = styled.div<ContainerProps>`
@@ -38,4 +39,5 @@ export const Container = styled.div<ContainerProps>`
   background-color: ${(props) =>
     props.backgroundColor ? props.backgroundColor : "transparent"};
   min-height: ${(props) => (props.minHeight ? props.minHeight : "")};
+  border-radius: ${(props) => (props.borderRadius ? props.borderRadius : "0")};
 `;
