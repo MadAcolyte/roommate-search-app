@@ -78,9 +78,9 @@ class PropertyListingCreateSerializer(serializers.ModelSerializer):
 
 class PropertyListingResponseSerializer(serializers.ModelSerializer):
     ownerId = serializers.IntegerField(source="owner.id", read_only=True)
-    roommatesCount = serializers.IntegerField(source="roomates_count", read_only=True)
+    roommatesCount = serializers.IntegerField(source="roommates_count", read_only=True)
     roommatesLookingForNumber = serializers.IntegerField(
-        source="roomates_looking_for_number",
+        source="roommates_looking_for_number",
         read_only=True
     )
     totalRooms = serializers.IntegerField(source="total_rooms", read_only=True)
