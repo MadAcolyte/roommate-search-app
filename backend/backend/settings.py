@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'users',
+    'listings'
 ]
 
 MIDDLEWARE = [
@@ -218,3 +219,6 @@ CORS_ALLOW_HEADERS = [
 ]
 
 CORS_PREFLIGHT_MAX_AGE = 3600
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
