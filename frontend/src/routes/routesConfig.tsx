@@ -2,6 +2,9 @@ import { ComponentType, lazy } from "react";
 
 const LoginPage = lazy(() => import("../pages/LoginPage/LoginPage"));
 const RegisterPage = lazy(() => import("../pages/RegisterPage/RegisterPage"));
+const NewListingPage = lazy(
+  () => import("../pages/NewListingPage/NewListingPage"),
+);
 const ListingsPage = lazy(() => import("../pages/ListingsPage/ListingsPage"));
 
 export interface Routes {
@@ -29,6 +32,11 @@ export const routes: Routes[] = [
   {
     path: "/home",
     page: () => <div>Home</div>,
+    isPrivate: true,
+  },
+  {
+    path: "/new-listing",
+    page: NewListingPage,
     isPrivate: true,
   },
 ];
