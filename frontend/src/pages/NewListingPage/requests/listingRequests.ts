@@ -1,10 +1,6 @@
-import { GenericResponse } from "../../../utils/api";
-import { ListingFormData } from "../types/listingTypes";
+import { POST, GenericResponse } from "../../../utils/api";
 
-const createListing = (_data: ListingFormData): Promise<GenericResponse> =>
-  Promise.resolve({
-    success: true,
-    message: "Listing created (stubbed)",
-  });
+const createListing = (data: FormData) =>
+  POST<GenericResponse>("/property-listings/create/", data);
 
 export default createListing;
