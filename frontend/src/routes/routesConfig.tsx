@@ -5,6 +5,7 @@ const RegisterPage = lazy(() => import("../pages/RegisterPage/RegisterPage"));
 const NewListingPage = lazy(
   () => import("../pages/NewListingPage/NewListingPage"),
 );
+const ListingsPage = lazy(() => import("../pages/ListingsPage/ListingsPage"));
 
 export interface Routes {
   path: string;
@@ -21,6 +22,11 @@ export const routes: Routes[] = [
   {
     path: "/register",
     page: RegisterPage,
+    isPrivate: false,
+  },
+  {
+    path: "/listings",
+    page: ListingsPage,
     isPrivate: false,
   },
   {

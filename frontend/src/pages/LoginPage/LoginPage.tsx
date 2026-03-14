@@ -8,10 +8,13 @@ import { useMutation } from "@tanstack/react-query";
 import { loginUser } from "./loginRequests/loginRequests";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { setUserProfile } from "../../store/userProfileSlice";
+import { useAppDispatch } from "../../store";
 
 const LoginPage = (): JSX.Element => {
   const form = useForm<LoginFormData>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
 
   const mutation = useMutation({
     mutationFn: loginUser,
@@ -21,6 +24,7 @@ const LoginPage = (): JSX.Element => {
     mutation.mutate(data, {
       onSuccess: (response) => {
         if (response.success && response.data) {
+          dispatch(setUserProfile(response.data));
           toast.success("Logged in successfully");
           navigate("/home");
         } else {
