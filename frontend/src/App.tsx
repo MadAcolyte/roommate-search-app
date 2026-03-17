@@ -5,12 +5,23 @@ import { initializeTokenRefresh, stopTokenRefresh } from "./utils/tokenRefresh";
 import { isPrivateRoute, isPublicRoute } from "./routes/routesConfig";
 import { useLocation, useNavigate } from "react-router-dom";
 import { isUserAuthenticated } from "./utils/authUtils";
+import Sidebar from "./components/Sidebar/Sidebar";
 
 const PageFallback = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
   min-height: 20rem;
+`;
+
+const AppLayout = styled.div`
+  display: flex;
+  min-height: 100dvh;
+`;
+
+const MainContent = styled.main`
+  flex: 1;
+  overflow: auto;
 `;
 
 const Loader = styled.div`
@@ -77,7 +88,12 @@ const RouteGuard = ({ children }: { children: JSX.Element }): JSX.Element => {
   return <>{children}</>;
 };
 
+const SIDEBAR_HIDDEN_PATHS = ["/login", "/register"];
+
 const App = (): JSX.Element => {
+  const location = useLocation();
+  const showSidebar = !SIDEBAR_HIDDEN_PATHS.includes(location.pathname);
+
   return (
     <>
       <Suspense
@@ -88,7 +104,16 @@ const App = (): JSX.Element => {
         }
       >
         <RouteGuard>
-          <AppRoutes />
+          {showSidebar ? (
+            <AppLayout>
+              <Sidebar />
+              <MainContent>
+                <AppRoutes />
+              </MainContent>
+            </AppLayout>
+          ) : (
+            <AppRoutes />
+          )}
         </RouteGuard>
       </Suspense>
     </>
