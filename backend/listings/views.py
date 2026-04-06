@@ -1,8 +1,8 @@
 from rest_framework import permissions, status, generics
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db import transaction
+from backend.api_response import api_success, api_error
 
 from .models import PropertyListing, PropertyListingImage
 from .serializers import (
@@ -39,18 +39,17 @@ class PropertyListingCreateView(APIView):
                     context={"request": request}
                 )
 
-                return Response(
-                    response_serializer.data,
-                    status=status.HTTP_201_CREATED
+                return api_success(
+                    data=response_serializer.data,
+                    message="Property listing created successfully",
+                    status_code=status.HTTP_201_CREATED,
                 )
 
         except Exception as exc:
-            return Response(
-                {
-                    "message": "Failed to create property listing.",
-                    "details": str(exc),
-                },
-                status=status.HTTP_400_BAD_REQUEST,
+            return api_error(
+                message="Failed to create property listing.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+                data={"details": str(exc)},
             )
 
 
@@ -66,6 +65,14 @@ class PropertyListingListView(generics.ListAPIView):
 
     def get_serializer_context(self):
         return {"request": self.request}
+
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return api_success(
+            data=response.data,
+            message="Property listings fetched successfully",
+            status_code=response.status_code,
+        )
 
 
 class PropertyListingDetailView(generics.RetrieveAPIView):
@@ -86,6 +93,14 @@ class PropertyListingDetailView(generics.RetrieveAPIView):
     def get_serializer_context(self):
         return super().get_serializer_context()
 
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return api_success(
+            data=response.data,
+            message="Property listing fetched successfully",
+            status_code=response.status_code,
+        )
+
 class MyPropertyListingListView(generics.ListAPIView):
     serializer_class = PropertyListingResponseSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -98,6 +113,14 @@ class MyPropertyListingListView(generics.ListAPIView):
     def get_serializer_context(self):
         return super().get_serializer_context()
 
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return api_success(
+            data=response.data,
+            message="My property listings fetched successfully",
+            status_code=response.status_code,
+        )
+
 class PropertyListingUpdateView(generics.UpdateAPIView):
     queryset = PropertyListing.objects.all()
     serializer_class = PropertyListingCreateSerializer
@@ -106,7 +129,12 @@ class PropertyListingUpdateView(generics.UpdateAPIView):
 
     def patch(self, request, *args, **kwargs):
         kwargs["partial"] = True
-        return self.update(request, *args, **kwargs)
+        response = self.update(request, *args, **kwargs)
+        return api_success(
+            data=response.data,
+            message="Property listing updated successfully",
+            status_code=response.status_code,
+        )
 
     def perform_update(self, serializer):
         listing = self.get_object()
@@ -126,3 +154,11 @@ class PropertyListingDeleteView(generics.DestroyAPIView):
             from rest_framework.exceptions import PermissionDenied
             raise PermissionDenied("You can only delete your own listings.")
         instance.delete()
+
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(request, *args, **kwargs)
+        return api_success(
+            data=None,
+            message="Property listing deleted successfully",
+            status_code=status.HTTP_200_OK,
+        )

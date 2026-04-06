@@ -7,12 +7,15 @@ import { LoginFormData } from "./types/loginTypes";
 import { useMutation } from "@tanstack/react-query";
 import { loginUser } from "./loginRequests/loginRequests";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { setUserProfile } from "../../store/userProfileSlice";
 import { useAppDispatch } from "../../store";
+import { COLORS } from "../../constants/colors";
 
 const LoginPage = (): JSX.Element => {
-  const form = useForm<LoginFormData>();
+  const form = useForm<LoginFormData>({
+    mode: "onChange",
+  });
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
@@ -73,6 +76,10 @@ const LoginPage = (): JSX.Element => {
             <Button type="submit" color="primary" disabled={mutation.isPending}>
               {mutation.isPending ? "Logging in..." : "Login"}
             </Button>
+            <div style={{ color: COLORS.PRIMARY, fontSize: "0.95rem" }}>
+              Don&apos;t have an account?{" "}
+              <Link to="/register">Register here</Link>
+            </div>
           </Container>
         </StyledForm>
       </FormProvider>

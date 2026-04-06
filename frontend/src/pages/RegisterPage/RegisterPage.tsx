@@ -7,11 +7,15 @@ import { RegisterFormData } from "./types/registerTypes";
 import { useMutation } from "@tanstack/react-query";
 import registerUser from "./requests/registerRequests";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { COLORS } from "../../constants/colors";
 
 const RegisterPage = (): JSX.Element => {
-  const form = useForm<RegisterFormData>();
+  const form = useForm<RegisterFormData>({
+    mode: "onChange",
+  });
   const navigate = useNavigate();
+  const passwordValue = form.watch("password") || "";
 
   const mutation = useMutation({
     mutationFn: registerUser,
@@ -71,14 +75,29 @@ const RegisterPage = (): JSX.Element => {
               label="Password"
               type="password"
               placeholder="********"
-              rules={{ required: "Password is required" }}
+              rules={{
+                required: "Password is required",
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters long",
+                },
+                pattern: {
+                  value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).+$/,
+                  message:
+                    "Password must include 1 lowercase, 1 uppercase and 1 symbol",
+                },
+              }}
             />
             <FormInput
               name="passwordConfirm"
               label="Confirm Password"
               type="password"
               placeholder="********"
-              rules={{ required: "Confirm Password is required" }}
+              rules={{
+                required: "Confirm Password is required",
+                validate: (value) =>
+                  value === passwordValue || "Passwords do not match",
+              }}
             />
             <FormInput
               name="firstName"
@@ -104,6 +123,9 @@ const RegisterPage = (): JSX.Element => {
             <Button type="submit" color="primary" disabled={mutation.isPending}>
               {mutation.isPending ? "Registering..." : "Register"}
             </Button>
+            <div style={{ color: COLORS.PRIMARY, fontSize: "0.95rem" }}>
+              Already have an account? <Link to="/login">Login here</Link>
+            </div>
           </Container>
         </StyledForm>
       </FormProvider>

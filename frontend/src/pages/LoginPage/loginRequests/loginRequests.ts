@@ -11,9 +11,14 @@ export type LoginResult = GenericResponseWithPayload<UserProfile>;
 export const loginUser = (data: LoginFormData): Promise<LoginResult> =>
   POST<GenericResponseWithPayload<AuthData>>("auth/login", data).then(
     async (response) => {
-      if (response.success && response.data) {
-        saveAuthData(response.data);
+      if (!response.success || !response.data) {
+        return {
+          success: false,
+          data: null,
+          message: response.message || "Login failed",
+        } as LoginResult;
       }
+      saveAuthData(response.data);
       const profileResponse =
         await GET<GenericResponseWithPayload<UserProfile>>("user/get_user");
       return profileResponse as LoginResult;
@@ -40,4 +45,18 @@ export const refreshToken = () => {
     }
     return response;
   });
+};
+
+export const logoutUser = async (): Promise<void> => {
+  const refreshTokenValue = getRefreshToken();
+  if (!refreshTokenValue) {
+    return;
+  }
+  try {
+    await POST<GenericResponseWithPayload<null>>("auth/logout", {
+      refreshToken: refreshTokenValue,
+    });
+  } catch {
+    // Server logout is best-effort; client session is cleared by caller.
+  }
 };
