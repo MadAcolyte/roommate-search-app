@@ -15,12 +15,17 @@ const PageFallback = styled.div`
 `;
 
 const AppLayout = styled.div`
+  box-sizing: border-box;
   display: flex;
-  min-height: 100dvh;
+  height: 100dvh;
+  max-height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
 `;
 
 const MainContent = styled.main`
   flex: 1;
+  min-height: 0;
   overflow: auto;
 `;
 
